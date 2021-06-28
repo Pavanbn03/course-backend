@@ -1,14 +1,16 @@
-const { Course, schema } = require("../models");
+import { schema, Course } from "../models";
 
 module.exports.getCourse = async (req, res) => {
   try {
     if (req.params.id) {
       const course = await Course.findById(req.params.id);
 
-      course ? res.send(course) : res.status(404).send("Not found");
+      course ? res.status(200).send(course) : res.status(404).send("Not found");
     } else {
       const courses = await Course.find();
-      courses ? res.send(courses) : res.status(404).send("Not found");
+      courses
+        ? res.status(200).send(courses)
+        : res.status(404).send("Not found");
     }
   } catch (exp) {
     res.send(exp.message);
@@ -47,13 +49,11 @@ module.exports.updateCourse = async (req, res) => {
     return;
   }
 
-  //   const coursedb = await Course.findById(req.params.id);
-  //   coursedb.set({ ...req.body });
   try {
-    // const data = await coursedb.save();
     const result = await Course.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
     });
+    await result.save();
     res.send(result);
   } catch (exp) {
     res.status(401).send(exp.message);
